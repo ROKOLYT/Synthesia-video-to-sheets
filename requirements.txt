@@ -1,0 +1,8 @@
+Pillow
+opencv-python
+numpy
+pandas
+matplotlib
+requests
+beautifulsoup4
+MIDIUtil
