@@ -1,6 +1,9 @@
 import yt_dlp as youtube_dl
+import json
 
-DIRECTORY = "videos/"
+with open('config.json') as f:
+    config = json.load(f)
+    DIRECTORY = config['temp_path']
 
 def download_video(url, name):
     ydl_opts = {

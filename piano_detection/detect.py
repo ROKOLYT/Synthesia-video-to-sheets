@@ -1,29 +1,31 @@
 import cv2
 import numpy as np
 import os
+import json
 
-DIRECTORY = 'piano_detection/pianos/'
-
-class Detect:
-    def __init__(self, offset):
-        self.offset = offset
+class Piano:
+    def __init__(self):
         self.piano_row = 0
         self.min_width = 8
         self.size = 20
         self.threshold = 0.1
         self.black = 200
-
-    def tiles(self, photo_path):
-        grayscale = self.calculate_grayscale()
-        # test(grayscale)
         
-        image = cv2.imread(photo_path, cv2.IMREAD_GRAYSCALE)
+        with open('config.json') as f:
+            config = json.load(f)
+            self.offset = config['offset']
+            self.piano_dir = config['piano_path']
+            self.piano_keys_screenshot = config['piano_keys_screenshot']
+
+    def tiles(self):
+        grayscale = self.calculate_grayscale()
+        image = cv2.imread(self.piano_keys_screenshot, cv2.IMREAD_GRAYSCALE)
         mask = self.mask_keys(image, grayscale)
         tiles = self.find_tile_centers(mask[5])
         
-        original = cv2.imread(photo_path)
+        original = cv2.imread(self.piano_keys_screenshot)
         self.draw_tile_centers(original, tiles)
-        original = cv2.imread(photo_path)
+        original = cv2.imread(self.piano_keys_screenshot)
         
         res = []
         for tile in tiles:
@@ -36,11 +38,11 @@ class Detect:
         return res
         
     def calculate_grayscale(self):
-        files = os.listdir(DIRECTORY)
+        files = os.listdir(self.piano_dir)
         grayscale = np.array([])
         
         for file in files:
-            image = cv2.imread(DIRECTORY + file, cv2.IMREAD_GRAYSCALE)
+            image = cv2.imread(self.piano_dir + file, cv2.IMREAD_GRAYSCALE)
             grayscale = np.append(grayscale, self.color_ratio(image))
         
         grayscale = np.mean(grayscale)

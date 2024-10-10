@@ -1,0 +1,1 @@
+{"tiles_path": "midi_processing/tiles.json", "piano_keys_screenshot": "piano_detection/tiles.jpg", "temp_path": "temp/", "piano_path": "piano_detection/pianos/", "output_path": "results/", "color_diff_threshold": 50, "color_diff_original_threshold": 20, "bpm": 160, "leftmost_key": 21, "offset": 70}

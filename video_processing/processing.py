@@ -2,15 +2,18 @@ import cv2
 import numpy as np
 import json
 
-DIRECTORY = "G:/.Programs/piano_video_to_sheets/videos/"
-OUT_DIR = "G:/.Programs/piano_video_to_sheets/output.json"
-SCREENSHOT = 'G:/.Programs/piano_video_to_sheets/piano_detection/tiles.jpg'
-
-class Process:
+class Video:
     def __init__(self, name, tiles, start_time, end_time):
-        self.diff = 50
-        self.diff_original = 20
-        self.video_path = DIRECTORY + name + '.mp4'
+        with open('config.json') as f:
+            config = json.load(f)
+            self.piano_keys_screenshot = config['piano_keys_screenshot']
+            self.temp_path = config['temp_path']
+            self.color_diff = config['color_diff_threshold']
+            self.color_diff_original = config['color_diff_original_threshold']
+            self.temp_path = config['temp_path']
+            self.tiles_dir = config['tiles_path']
+            
+        self.video_path = self.temp_path + name + '.mp4'
         self.cap = cv2.VideoCapture(self.video_path)
         self.tiles = tiles
         self.fps = round(self.cap.get(cv2.CAP_PROP_FPS))
@@ -21,13 +24,14 @@ class Process:
         self.data = {'FPS': self.fps, 'name': name, 'tiles': [[] for _ in range(len(tiles))]}
 
         # Create a VideoWriter object to save the output video
-        self.output_video_path = DIRECTORY + name + '_output.mp4'
+        self.output_video_path = self.temp_path + name + '_output.mp4'
         self.out = cv2.VideoWriter(self.output_video_path, cv2.VideoWriter_fourcc(*'mp4v'), self.fps, self.frame_size)
 
         # Initialize with a list where each entry corresponds to the last frame a circle was drawn for each tile
         self.circle_tiles = [False] * len(self.tiles)
         
         if not self.cap.isOpened():
+            print(self.video_path)
             raise ValueError("Error: Could not open the video.")
         
     def frame(self):
@@ -56,15 +60,15 @@ class Process:
             bd, gd, rd = np.array(bd, dtype=np.int32), np.array(gd, dtype=np.int32), np.array(rd, dtype=np.int32)
             
             dif_sum = abs(b - bo) + abs(g - go) + abs(r - ro)
-            diff_original = abs(b - bd) + abs(g - gd) + abs(r - rd)
+            color_diff_original = abs(b - bd) + abs(g - gd) + abs(r - rd)
             
             # If color change is detected
-            if dif_sum > self.diff and diff_original > self.diff_original and not pressed:
+            if dif_sum > self.color_diff and color_diff_original > self.color_diff_original and not pressed:
                 self.circle_tiles[idx] = True
                 self.data['tiles'][idx].append(self.target_frame)
                 self.tiles[idx]['pressed'] = True
             
-            elif diff_original < self.diff_original and pressed:
+            elif color_diff_original < self.color_diff_original and pressed:
                 if self.circle_tiles[idx]:
                     self.data['tiles'][idx].append(self.target_frame)
                 self.circle_tiles[idx] = False
@@ -90,7 +94,7 @@ class Process:
         # Release the video writer and capture objects
         self.cap.release()
         self.out.release()
-        with open(OUT_DIR, 'w') as f:
+        with open(self.tiles_dir, 'w') as f:
             json.dump(self.data, f, indent=4)
         
     def circles(self, frame):
@@ -116,7 +120,7 @@ class Process:
         if not ret:
             raise ValueError("Error: Could not read the frame.")
         
-        cv2.imwrite(SCREENSHOT, frame)
+        cv2.imwrite(self.piano_keys_screenshot, frame)
     
     def release(self):
         self.cap.release()
