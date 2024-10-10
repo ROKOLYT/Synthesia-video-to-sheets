@@ -32,7 +32,7 @@ This project converts piano performance videos into sheet music.
     end_time = 60  # End time of the transcription in seconds
     url = 'https://www.example.com'  # URL of the video
     name = 'Example Piece'  # Name of the piece
-    offset = 0  # Offset to synchronize video and audio
+    offset = 0  # Offset to line up they key detection
     ```
 2. Run the application:
     ```sh
@@ -41,8 +41,11 @@ This project converts piano performance videos into sheet music.
 
 ## Leftmost Key
 
-The leftmost key can be determined by counting the keys to the left of C4.
-The C4 key is ```key = 60```. Maybe in the future I'll implement some logic to figure out the leftmost. If you want to do it feel free to contribute.
+The leftmost key can be identified by counting the keys to the left of C4. The C4 key corresponds to `key = 60`. In the future, I may implement logic to automatically determine the leftmost key. If you are interested in contributing, feel free to submit a pull request.
+
+## Offset
+
+Adjust the offset until the red dots align with both the black and white keys. **Ensure the red dots are not positioned at the very top of the keys, as some videos may have light effects in that area.**
 
 ## Contributing
 
