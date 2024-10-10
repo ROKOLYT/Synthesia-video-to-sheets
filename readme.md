@@ -54,4 +54,4 @@ This project is licensed under the MIT License.
 
 ## Contact
 
-For any questions or suggestions, please open an issue or contact [your email].
+For any questions or suggestions, please open an issue.
